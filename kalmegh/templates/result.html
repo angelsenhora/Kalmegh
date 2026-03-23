@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Result - Kalmegh</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>&#127807; Kalmegh</h1>
+      <p class="subtitle">Detection Result</p>
+    </header>
+
+    <div class="card result-card">
+
+      {% if error %}
+        <div class="alert">
+          <p>&#9888; {{ error }}</p>
+        </div>
+
+      {% else %}
+        <img src="{{ image_url }}" alt="Uploaded leaf image" class="result-img"/>
+
+        {% set is_healthy = (prediction == 'Healthy') %}
+
+        <div class="result-badge {{ 'healthy' if is_healthy else 'diseased' }}">
+          {% if is_healthy %}
+            &#9989; Healthy
+          {% else %}
+            &#9888; Diseased
+          {% endif %}
+        </div>
+
+        {% if confidence is not none %}
+          {% set conf_rounded = confidence | round(2) %}
+          {% set bar_width = confidence | round(1) %}
+          <div class="confidence-bar-wrap">
+            <p>Confidence: <strong>{{ conf_rounded }}%</strong></p>
+            <div class="confidence-bar">
+              <div class="confidence-fill {{ 'healthy' if is_healthy else 'diseased' }}"
+                   data-width="{{ bar_width }}"></div>
+            </div>
+          </div>
+        {% endif %}
+
+        <p class="model-tag">Model used: <strong>{{ model_used }}</strong></p>
+
+      {% endif %}
+
+      <a href="/" class="btn-predict btn-back">
+        &#8592; Analyse Another Image
+      </a>
+
+    </div>
+
+    <footer>
+      <p></p>
+    </footer>
+  </div>
+
+  <script>
+    // Animate confidence bar width after page load
+    document.addEventListener('DOMContentLoaded', function () {
+      var fill = document.querySelector('.confidence-fill');
+      if (fill) {
+        var w = fill.getAttribute('data-width');
+        fill.style.width = '0%';
+        setTimeout(function () {
+          fill.style.width = w + '%';
+        }, 100);
+      }
+    });
+  </script>
+</body>
+</html>

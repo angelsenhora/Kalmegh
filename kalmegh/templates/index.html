@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kalmegh - Plant Disease Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>&#127807; Kalmegh</h1>
+      <p class="subtitle">Plant Disease Detection from Leaf Images</p>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert">
+          {% for msg in messages %}
+            <p>{{ msg }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="card">
+      <form action="/predict" method="POST" enctype="multipart/form-data" id="uploadForm">
+
+        <div class="upload-area" id="dropZone">
+          <input type="file" name="file" id="fileInput"
+                 accept=".jpg,.jpeg,.png,.webp" required hidden/>
+          <label for="fileInput" class="upload-label">
+            <span class="icon">&#128193;</span>
+            <span id="fileName">Click to upload or drag &amp; drop a leaf image</span>
+            <span class="hint">Supports JPG, PNG, WEBP &mdash; max 10 MB</span>
+          </label>
+          <img id="preview" src="" alt="Image preview"
+               style="display:none; max-width:280px; margin-top:14px; border-radius:8px;"/>
+        </div>
+
+        <div class="model-select">
+          <label for="modelSelect">Choose Model:</label>
+          <select name="model" id="modelSelect">
+            <option value="ml">Best ML Model (SVM / KNN / DT)</option>
+            <option value="cnn">CNN (Deep Learning)</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-predict" id="submitBtn">
+          Detect Disease
+        </button>
+
+      </form>
+    </div>
+
+    <footer>
+      <p></p>
+    </footer>
+  </div>
+
+  <script>
+    var input    = document.getElementById('fileInput');
+    var preview  = document.getElementById('preview');
+    var fileName = document.getElementById('fileName');
+    var submitBtn = document.getElementById('submitBtn');
+    var form     = document.getElementById('uploadForm');
+
+    input.addEventListener('change', function () {
+      var file = input.files[0];
+      if (file) {
+        fileName.textContent = file.name;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    form.addEventListener('submit', function () {
+      submitBtn.textContent = 'Analysing...';
+      submitBtn.disabled = true;
+    });
+
+    // Drag & drop support
+    var zone = document.getElementById('dropZone');
+
+    zone.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+
+    zone.addEventListener('dragleave', function () {
+      zone.classList.remove('drag-over');
+    });
+
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length > 0) {
+        input.files = e.dataTransfer.files;
+        input.dispatchEvent(new Event('change'));
+      }
+    });
+  </script>
+</body>
+</html>
