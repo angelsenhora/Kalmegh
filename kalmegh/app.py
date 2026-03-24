@@ -6,7 +6,7 @@ import os
 import uuid
 
 from flask import Flask, render_template, request, redirect, url_for, flash
-from predict import predict
+from kalmegh.predict import predict
 
 UPLOAD_FOLDER = os.path.join("static", "uploads")
 ALLOWED_EXT   = {"png", "jpg", "jpeg", "webp"}
